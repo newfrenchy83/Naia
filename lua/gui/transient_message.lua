@@ -96,5 +96,5 @@ function wesnoth.wml_actions.transient_message(cfg)
 	local sound = cfg.sound
 	if sound ~= nil then wesnoth.audio.play(sound) end
 
-	wesnoth.show_dialog(dd, preshow, nil)
+	gui.show_dialog(dd, preshow, nil)
 end

@@ -626,7 +626,7 @@ function naia_do_amla_menu(cfg)
 	-- Set-up the actual dialog
 	--
 
-	wesnoth.show_dialog(amla_dlg, function()
+	gui.show_dialog(amla_dlg, function()
 		-- Variables
 
 		local current_filter = ADV_FILTERS.adv_display_all

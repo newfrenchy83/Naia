@@ -95,7 +95,7 @@ function wesnoth.wml_actions.npc_bird_behavior(cfg)
 			for j = 0, move_steps, 1 do
 				if oob then break end
 
-				local target = wesnoth.get_locations({
+				local target = wesnoth.map.find({
 					{ "filter_adjacent_location", {
 						adjacent = "-" .. path.direction,
 						x = endpoint.x,

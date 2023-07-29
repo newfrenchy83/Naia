@@ -21,9 +21,10 @@ end
 --
 -- Used to defer execution of GUI code to preload to avoid issues
 --
+
 local function defer(func)
 	table.insert(deferred_executes, func)
-	wesnoth.add_event_handler {
+	wesnoth.game_events.add_wml {
 		id   = "naia:deferred_execute",
 		name = "preload",
 		wml.tag.naia__deferred_unsynced_execute {},

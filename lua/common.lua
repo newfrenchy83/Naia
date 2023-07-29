@@ -78,12 +78,12 @@ function wesnoth.wml_actions.store_direction(cfg)
 	local b = { x = cfg.to_x  , y = cfg.to_y   }
 
 	if from_slf then
-		a.x = wesnoth.get_locations(from_slf)[1][1]
-		a.y = wesnoth.get_locations(from_slf)[1][2]
+		a.x = wesnoth.map.find(from_slf)[1][1]
+		a.y = wesnoth.map.find(from_slf)[1][2]
 	end
 	if to_slf then
-		b.x = wesnoth.get_locations(to_slf)[1][1]
-		b.y = wesnoth.get_locations(to_slf)[1][2]
+		b.x = wesnoth.map.find(to_slf)[1][1]
+		b.y = wesnoth.map.find(to_slf)[1][2]
 	end
 
 	if not a.x or not a.y or not b.x or not b.y then
@@ -155,7 +155,7 @@ function wesnoth.wml_actions.set_facing(cfg)
 			target_u = wesnoth.units.find_on_map(target_suf)[1] or
 				wml.error("[set_facing] Could not match the specified [filter_second] unit")
 		elseif target_slf then
-			target_loc = wesnoth.get_locations(target_slf)[1] or
+			target_loc = wesnoth.map.find(target_slf)[1] or
 				wml.error("[set_facing] Could not match the specified [filter_location] location")
 		end
 	end
@@ -220,7 +220,7 @@ function wesnoth.wml_actions.setup_doors(cfg)
 	end
 
 	cfg.side = nil
-	local locs = wesnoth.get_locations(cfg)
+	local locs = wesnoth.map.find(cfg)
 
 	for k, loc in ipairs(locs) do
 		if not wesnoth.units.get(loc[1], loc[2]) then
@@ -281,7 +281,7 @@ end
 -- [/item_fast]
 ---
 function wesnoth.wml_actions.item_fast(cfg)
-	local locs = wesnoth.get_locations(cfg)
+	local locs = wesnoth.map.find(cfg)
 	cfg = wml.parsed(cfg)
 
 	if not cfg.image and not cfg.halo then
@@ -304,12 +304,13 @@ end
 -- [/remove_terrain_overlays]
 ---
 function wesnoth.wml_actions.remove_terrain_overlays(cfg)
-	local locs = wesnoth.get_locations(cfg)
+	local locs = wesnoth.map.find(cfg)
 
 	for i, loc in ipairs(locs) do
-		local locstr = wesnoth.get_terrain(loc[1], loc[2])
+		local loci = wesnoth.map.read_location(loc[1], loc[2])
+		local locstr = wesnoth.current.map[loci]
 		local newstr = string.gsub(locstr, "%^.*$", "")
-		wesnoth.set_terrain(loc[1], loc[2], newstr)
+		wesnoth.current.map[loci] = newstr
 	end
 end
 
@@ -324,7 +325,7 @@ end
 ---
 function wesnoth.wml_actions.simplify_location_filter(cfg)
 	local var = cfg.variable or "location"
-	local locs = wesnoth.get_locations(cfg)
+	local locs = wesnoth.map.find(cfg)
 	local xstr, ystr = "", ""
 
 	wml.variables[var] = nil
@@ -369,7 +370,7 @@ function wesnoth.wml_actions.animate_attack(cfg)
 	local _ = wesnoth.textdomain "wesnoth"
 	-- #textdomain wesnoth
 
-	local this_unit = utils.start_var_scope("this_unit")
+	local this_unit = wml_utils.scoped_var("this_unit")
 
 	wml.variables.this_unit = nil -- clearing this_unit
 	wml.variables.this_unit = defender.__cfg -- cfg field needed
@@ -416,7 +417,7 @@ function wesnoth.wml_actions.animate_attack(cfg)
 	local damage = calculate_damage(
 		amount, (cfg.alignment or "neutral"),
 		wesnoth.schedule.get_illumination({ defender.x, defender.y }).lawful_bonus,
-		wesnoth.unit_resistance( defender, cfg.damage_type or "dummy" )
+		wesnoth.units.resistance_against( defender, cfg.damage_type or "dummy" )
 	)
 
 	local hit_animation_type = true
@@ -501,7 +502,7 @@ function wesnoth.wml_actions.animate_attack(cfg)
 	wesnoth.wml_actions.redraw {}
 
 	wml.variables.this_unit = nil -- clearing this_unit
-	utils.end_var_scope("this_unit", this_unit)
+	wml_utils.scoped_var("this_unit", this_unit)
 end
 
 ---
@@ -881,7 +882,7 @@ end
 -- [/scatter_images]
 ---
 function wesnoth.wml_actions.scatter_images(cfg)
-	local locs = wesnoth.get_locations(cfg) or
+	local locs = wesnoth.map.find(cfg) or
 		wml.error("[scatter_images] No suitable locations found.")
 
 	local count = cfg.limit
@@ -910,7 +911,7 @@ function wesnoth.wml_actions.deactivate_and_serialize_sides(cfg)
 
 	wml.variables[variable] = {}
 
-	for t, side_number in helper.get_sides(cfg) do
+	for t, side_number in wesnoth.sides.iter(cfg) do
 		-- wesnoth.message("WML", ("store side %u"):format(side_number))
 		local side_store = ("%s[%u]"):format(variable, array_index)
 
@@ -982,7 +983,7 @@ function wesnoth.wml_actions.clear_map_labels(cfg)
 
 	for x = 1, w do
 		for y = 1, h do
-			wesnoth.label { x = x, y = y, text = nil }
+			wesnoth.map.add_label { x = x, y = y, text = nil }
 		end
 	end
 end

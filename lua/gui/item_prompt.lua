@@ -134,7 +134,7 @@ function wesnoth.wml_actions.item_prompt(cfg)
 	end
 
 	local res = wesnoth.sync.evaluate_single(function()
-		return { value = wesnoth.show_dialog(dd, function()
+		return { value = gui.show_dialog(dd, function()
 			-- #textdomain wesnoth-Naia
 			local _ = wesnoth.textdomain "wesnoth-Naia"
 			local message = _ "Do you want this unit to pick up this item?"

@@ -174,7 +174,7 @@ function damage_action:new(source, target, primary_attack, secondary_attack, dat
 
 	local damage_type = data.damage_type or "dummy"
 	local tod_bonus = wesnoth.schedule.get_illumination({ o.target.x, o.target.y }).lawful_bonus
-	local resistance = wesnoth.unit_resistance(o.target, damage_type)
+	local resistance = wesnoth.units.resistance_against(o.target, damage_type)
 	local resistance_multiplier = tonumber(data.resistance_multiplier) or 1
 	local base_damage = tonumber(data.amount)
 	local alignment = data.alignment or "neutral"
@@ -343,7 +343,7 @@ function wesnoth.wml_actions.harm_multiple_units(cfg)
 		do_error("Missing required amount= attribute")
 	end
 
-	local this_unit = utils.start_var_scope("this_unit")
+	local this_unit = wml_utils.scoped_var("this_unit")
 
 	local targets = wesnoth.units.find_on_map(filter)
 	if not targets then
@@ -405,7 +405,7 @@ function wesnoth.wml_actions.harm_multiple_units(cfg)
 	wesnoth.wml_actions.redraw {}
 
 	wml.variables.this_unit = nil
-	utils.end_var_scope("this_unit", this_unit)
+	wml_utils.scoped_var("this_unit", this_unit)
 
 	wunindent()
 	do_wprintf(W_DBG, "LEAVE: core block")
