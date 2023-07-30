@@ -14,7 +14,7 @@ NAIA_PREFIX                = (...).prefix
 WESNOTH_VERSION            = wesnoth.current_version()
 WML_INIT                   = wml.get_child(..., "init")
 
-helper                     = wesnoth.require("helper.lua")
+helper                     = wml
 utils                      = wesnoth.require("wml-utils.lua")
 on_event                   = wesnoth.require("on_event.lua")
 
